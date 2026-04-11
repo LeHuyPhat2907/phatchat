@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "586438514435",
+    "project_id": "phatchat-8ea33",
+    "storage_bucket": "phatchat-8ea33.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:586438514435:android:d5cef5939aa6d737a13b36",
+        "android_client_info": {
+          "package_name": "com.example.phatchat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnJlkbQ4B7ISJnNFNktF5Q0dC8FWIpZsE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
