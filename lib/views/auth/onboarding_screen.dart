@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../utils/app_constants.dart';
+import '../auth/login_screen.dart';
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
@@ -58,7 +59,13 @@ class OnboardingScreen extends StatelessWidget {
                   width: double.infinity,
                   height: 55,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // Điều hướng sang màn hình Login
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const LoginScreen()),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.messengerBlue,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
