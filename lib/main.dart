@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'utils/app_constants.dart'; // Import file màu sắc
 import 'services/firebase_service.dart';
+import 'views/auth/onboarding_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,23 +32,7 @@ class MyApp extends StatelessWidget {
         // Cấu hình font chữ mặc định
         fontFamily: 'Roboto', // Có thể thêm font khác sau
       ),
-      home: Scaffold(
-        appBar: AppBar(
-            title: const Text("PhatChat", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            backgroundColor: AppColors.messengerBlue,
-            centerTitle: true,
-          ),
-        body: const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.chat_bubble, size: 80, color: AppColors.messengerBlue),
-              SizedBox(height: 20),
-              Text("Chào Phát! App đã sẵn sàng.", style: AppTextStyles.body),
-            ],
-          ),
-        ),
-        ),
+      home: OnboardingScreen(),
       );
   }
 }
