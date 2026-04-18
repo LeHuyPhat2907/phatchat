@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../utils/app_constants.dart';
+import '../auth/register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -108,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                       ),
                     ),
-                    const SizedBox(height: 100),
+                    TextButton(onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterScreen()));}, child: const Text("Bạn chưa có tài khoản? Đăng ký ngay."))
                   ],
                 ),
               ),
