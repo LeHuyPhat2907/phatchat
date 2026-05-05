@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../utils/app_constants.dart';
 import '../auth/register_screen.dart';
+import '../../services/auth_service.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -10,10 +12,43 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final AuthService _authService = AuthService();
+  bool _isLoading = false;
   // Controller để lấy dữ liệu từ các ô nhập
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
+
+  void _handleLogin() async {
+    // Kiểm tra xem người dùng đã nhập đủ chưa
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Vui lòng nhập đầy đủ email và mật khẩu!")),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    String? result = await _authService.signInWithEmail(
+      _emailController.text.trim(),
+      _passwordController.text.trim(),
+    );
+
+    setState(() => _isLoading = false);
+
+    if (result == "success") {
+      // Tạm thời hiện thông báo thành công, Task sau chúng ta sẽ chuyển sang màn hình chính (Home)
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Đăng nhập thành công!")),
+      );
+      // Navigator.pushReplacement(...) - Sẽ làm ở giai đoạn sau
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result ?? "Có lỗi xảy ra")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,10 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: double.infinity,
                       height: 55,
                       child: ElevatedButton(
-                        onPressed: () {
-                          // Logic đăng nhập sẽ làm ở Task 12
-                          print("Email: ${_emailController.text}");
-                        },
+                        onPressed: _isLoading ? null : _handleLogin,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.messengerBlue,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

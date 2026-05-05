@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../utils/app_constants.dart';
+import '../../services/auth_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -9,7 +10,38 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final AuthService _authService = AuthService();
+  bool _isLoading = false; // Để hiện vòng xoay khi đang xử lý
   int _currentStep = 1; // Quản lý bước hiện tại (1, 2, hoặc 3)
+
+  // 2. Sửa hàm xử lý khi nhấn nút "Đăng ký" ở Bước 2
+  void _handleRegister() async {
+    if (_passController.text != _confirmPassController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Mật khẩu xác nhận không khớp!")),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    String? result = await _authService.registerWithEmail(
+      _emailController.text.trim(),
+      _passController.text.trim(),
+    );
+
+    setState(() => _isLoading = false);
+
+    if (result == "success") {
+      // Chuyển sang Bước 3 (Thành công)
+      setState(() => _currentStep = 3);
+    } else {
+      // Hiển thị lỗi cho người dùng
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result ?? "Có lỗi xảy ra")),
+      );
+    }
+  }
 
   // Controllers cho các ô nhập liệu
   final _emailController = TextEditingController();
@@ -105,7 +137,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         _buildTextField("Xác nhận lại mật khẩu mới", _confirmPassController, isPass: true),
 
         const SizedBox(height: 40),
-        _buildButton("Đăng ký", () => setState(() => _currentStep = 3)),
+        _buildButton("Đăng ký", () => _handleRegister()),
         const SizedBox(height: 10),
         Center(
           child: OutlinedButton(
@@ -176,9 +208,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       width: double.infinity,
       height: 55,
       child: ElevatedButton(
-        onPressed: onPressed,
+        onPressed: _isLoading ? null : onPressed, // Vô hiệu hóa nút khi đang load
         style: ElevatedButton.styleFrom(backgroundColor: AppColors.messengerBlue, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-        child: Text(text, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+        child: _isLoading
+            ? const CircularProgressIndicator(color: Colors.white) // Hiện vòng xoay
+            : Text(text, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
       ),
     );
   }
