@@ -4,9 +4,11 @@ import 'firebase_options.dart';
 import 'utils/app_constants.dart'; // Import file màu sắc
 import 'services/firebase_service.dart';
 import 'views/auth/onboarding_screen.dart';
+import 'views/auth/auth_wrapper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
 
   // Gọi hàm khởi tạo từ FirebaseService
   await FirebaseService.setupFirebase();
@@ -32,7 +34,7 @@ class MyApp extends StatelessWidget {
         // Cấu hình font chữ mặc định
         fontFamily: 'Roboto', // Có thể thêm font khác sau
       ),
-      home: OnboardingScreen(),
+      home: const AuthWrapper(),
       );
   }
 }

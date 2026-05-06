@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../utils/app_constants.dart';
 import '../auth/register_screen.dart';
 import '../../services/auth_service.dart';
+import '../auth/forgot_password_screen.dart';
 
 
 class LoginScreen extends StatefulWidget {
@@ -121,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     // Quên mật khẩu
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()));},
                       child: const Text("Bạn quên mật khẩu?",
                           style: TextStyle(color: AppColors.messengerBlue, fontWeight: FontWeight.bold)),
                     ),

@@ -16,6 +16,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   // 2. Sửa hàm xử lý khi nhấn nút "Đăng ký" ở Bước 2
   void _handleRegister() async {
+
+    if (!isValidEmail(_emailController.text.trim())) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Email không đúng định dạng!")),
+      );
+      return;
+    }
+
     if (_passController.text != _confirmPassController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Mật khẩu xác nhận không khớp!")),
@@ -25,9 +33,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     setState(() => _isLoading = true);
 
+    String fullName = "${_firstNameController.text} ${_lastNameController.text}";
+
     String? result = await _authService.registerWithEmail(
       _emailController.text.trim(),
       _passController.text.trim(),
+      fullName, // Truyền thêm tên vào đây
     );
 
     setState(() => _isLoading = false);

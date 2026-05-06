@@ -1,15 +1,36 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../models/user_model.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance; // Khai báo Firestore
 
   // Hàm Đăng ký tài khoản
-  Future<String?> registerWithEmail(String email, String password) async {
+  Future<String?> registerWithEmail(String email, String password, String name) async {
     try {
-      await _auth.createUserWithEmailAndPassword(
+      // 1. Tạo user trên Firebase Auth
+      UserCredential credential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
+
+      // 2. Nếu thành công, tạo tiếp Document trên Firestore
+      if (credential.user != null) {
+        UserModel newUser = UserModel(
+          uid: credential.user!.uid,
+          email: email,
+          name: name,
+          avatarUrl: "", // Tạm thời để trống, sẽ làm ở Task upload ảnh sau
+          status: "online",
+          lastSeen: DateTime.now(),
+        );
+
+        await _firestore
+            .collection('users')
+            .doc(credential.user!.uid)
+            .set(newUser.toMap());
+      }
       return "success"; // Đăng ký thành công
     } on FirebaseAuthException catch (e) {
       // Xử lý các lỗi cụ thể từ Firebase
@@ -47,4 +68,25 @@ class AuthService {
       return e.toString();
     }
   }
+
+  Future<void> signOut() async {
+    await _auth.signOut();
+  }
+
+  Future<String?> sendPasswordReset(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      return "success";
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        return "Không tìm thấy tài khoản với email này.";
+      } else if (e.code == 'invalid-email') {
+        return "Định dạng email không hợp lệ.";
+      }
+      return e.message;
+    } catch (e) {
+      return e.toString();
+    }
+  }
 }
+
