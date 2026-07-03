@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../utils/app_constants.dart';
 import '../chat/chat_list_screen.dart';
+import '../people/people_screen.dart';
+import '../profile/profile_screen.dart';
 // Import các màn hình con của bạn ở đây
 
 class MainScreen extends StatefulWidget {
@@ -16,8 +18,8 @@ class _MainScreenState extends State<MainScreen> {
   // Danh sách các màn hình tương ứng với từng Tab
   final List<Widget> _pages = [
     const ChatListScreen(), // Thay bằng ChatListScreen()
-    const Center(child: Text("Màn hình Mọi người")), // Thay bằng PeopleScreen()
-    const Center(child: Text("Màn hình Cá nhân")),  // Thay bằng ProfileScreen()
+    const PeopleScreen(),// Thay bằng PeopleScreen()
+    const ProfileScreen(),  // Thay bằng ProfileScreen()
   ];
 
   void _onItemTapped(int index) {
