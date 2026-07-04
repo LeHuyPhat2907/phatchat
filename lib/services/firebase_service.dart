@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import '../firebase_options.dart';
 
-class FirebaseService {
+class AppFirebaseService {
   // Hàm static để gọi mà không cần khởi tạo class
   static Future<void> setupFirebase() async {
     // Đảm bảo Flutter framework đã sẵn sàng

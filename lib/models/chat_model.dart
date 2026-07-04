@@ -5,6 +5,7 @@ class MessageModel {
   final String senderId;
   final String receiverId;
   final String message;
+  final String type;
   final Timestamp timestamp;
   final bool isRead;
 
@@ -12,6 +13,7 @@ class MessageModel {
     required this.senderId,
     required this.receiverId,
     required this.message,
+    this.type = 'text', // Mặc định là text
     required this.timestamp,
     this.isRead = false,
   });
@@ -21,6 +23,7 @@ class MessageModel {
       'senderId': senderId,
       'receiverId': receiverId,
       'message': message,
+      'type': type, // Lưu type lên Firebase
       'timestamp': timestamp,
       'isRead': isRead,
     };
@@ -31,6 +34,7 @@ class MessageModel {
       senderId: map['senderId'] ?? '',
       receiverId: map['receiverId'] ?? '',
       message: map['message'] ?? '',
+      type: map['type'] ?? 'text',
       timestamp: map['timestamp'] ?? Timestamp.now(),
       isRead: map['isRead'] ?? false,
     );

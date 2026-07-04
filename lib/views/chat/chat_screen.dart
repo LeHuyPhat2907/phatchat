@@ -5,6 +5,7 @@ import '../../services/chat_service.dart';
 import '../../utils/app_constants.dart';
 import '../../utils/chat_helper.dart';
 import '../../utils/date_formatter.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ChatScreen extends StatefulWidget {
   final String receiverName;
@@ -123,6 +124,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   itemBuilder: (context, index) {
                     var msgData = messages[index].data() as Map<String, dynamic>;
                     String messageId = messages[index].id; // Lấy ID của tin nhắn từ Firestore
+                    String type = msgData['type'] ?? 'text'; // Lấy type từ Firestore
 
                     // Kiểm tra xem tin nhắn này là của mình hay của đối phương
                     bool isMe = msgData['senderId'] == currentUserId;
@@ -135,6 +137,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       isMe: isMe,
                       avatarUrl: isMe ? null : widget.receiverAvatarUrl,
                       time: formattedTime, // Truyền vào đây
+                      type: type,
                       onLongPress: isMe ? () => _showDeleteConfirmDialog(context, messageId) : null,
                     );
                   },
@@ -242,24 +245,66 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  // Thêm biến time vào tham số
-  Widget _buildMessageBubble({required String text, required bool isMe, String? avatarUrl, required String time, VoidCallback? onLongPress,}) {
+  // Cập nhật hàm bong bóng chat
+  Widget _buildMessageBubble({
+    required String text,
+    required bool isMe,
+    String? avatarUrl,
+    required String time,
+    required String type, // Nhận thêm type vào
+    VoidCallback? onLongPress,
+  }) {
     return GestureDetector(
-        onLongPress: onLongPress, // Bắt sự kiện ở đây
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: Row(mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              if (!isMe && avatarUrl != null) ...[
-                CircleAvatar(radius: 12, backgroundImage: NetworkImage(avatarUrl)),
-                const SizedBox(width: 8),
-              ],
+      onLongPress: onLongPress,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: Row(
+          mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            if (!isMe && avatarUrl != null) ...[
+              CircleAvatar(radius: 12, backgroundImage: NetworkImage(avatarUrl)),
+              const SizedBox(width: 8),
+            ],
 
-              Flexible(
-                child: Column(
-                  crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                  children: [
+            Flexible(
+              child: Column(
+                crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                children: [
+                  // KIỂM TRA TYPE ĐỂ HIỂN THỊ
+                  // KIỂM TRA TYPE ĐỂ HIỂN THỊ
+                  if (type == 'image')
+                    ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        topLeft: const Radius.circular(20),
+                        topRight: const Radius.circular(20),
+                        bottomLeft: isMe ? const Radius.circular(20) : const Radius.circular(5),
+                        bottomRight: isMe ? const Radius.circular(5) : const Radius.circular(20),
+                      ),
+                      // THAY THẾ IMAGE.NETWORK BẰNG CACHEDNETWORKIMAGE Ở ĐÂY
+                      child: CachedNetworkImage(
+                        imageUrl: text, // text chính là link ảnh
+                        width: 200,
+                        fit: BoxFit.cover,
+                        // Hiển thị vòng xoay trong lúc chờ tải ảnh lần đầu
+                        placeholder: (context, url) => const SizedBox(
+                          width: 200,
+                          height: 200,
+                          child: Center(
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                        // Hiển thị icon báo lỗi nếu link ảnh bị hỏng
+                        errorWidget: (context, url, error) => Container(
+                          width: 200,
+                          height: 200,
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.broken_image, color: Colors.grey, size: 50),
+                        ),
+                      ),
+                    )
+                  else
+                  // Nếu là text bình thường thì giữ nguyên giao diện cũ
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                       decoration: BoxDecoration(
@@ -268,15 +313,15 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                       child: Text(text, style: TextStyle(color: isMe ? Colors.white : Colors.black, fontSize: 16)),
                     ),
-                    const SizedBox(height: 4),
-                    // HIỂN THỊ THỜI GIAN NHỎ Ở DƯỚI BONG BÓNG CHAT
-                    Text(time, style: const TextStyle(color: Colors.grey, fontSize: 10)),
-                  ],
-                ),
+
+                  const SizedBox(height: 4),
+                  Text(time, style: const TextStyle(color: Colors.grey, fontSize: 10)),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
+      ),
     );
   }
 }

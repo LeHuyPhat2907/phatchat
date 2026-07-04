@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/chat_model.dart';
 import '../utils/chat_helper.dart'; // Nơi chứa hàm getChatRoomId hôm trước
+import 'dart:io';
+import 'storage_service.dart';
 
 class ChatService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -88,6 +90,44 @@ class ChatService {
 
     } catch (e) {
       print("Lỗi khi xóa tin nhắn: $e");
+    }
+  }
+
+  // Hàm xử lý gửi tin nhắn hình ảnh
+  Future<void> sendImageMessage(String receiverId, File imageFile) async {
+    try {
+      // 1. Dùng StorageService đẩy ảnh lên và lấy URL về
+      String? imageUrl = await StorageService().uploadImage(imageFile, 'chat_images');
+
+      if (imageUrl == null) return; // Nếu lỗi upload thì dừng lại
+
+      final String currentUserId = _auth.currentUser!.uid;
+      String roomId = ChatHelper.getChatRoomId(currentUserId, receiverId);
+
+      // 2. Lưu tin nhắn vào collection 'messages' với type = 'image'
+      await _firestore
+          .collection('chat_rooms')
+          .doc(roomId)
+          .collection('messages')
+          .add({
+        'senderId': currentUserId,
+        'receiverId': receiverId,
+        'message': imageUrl, // Lưu URL tải xuống vào nội dung
+        'type': 'image',     // Đánh dấu đây là ảnh
+        'isRead': false,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      // 3. Cập nhật hiển thị ngoài danh sách Chat (Home)
+      await _firestore.collection('chat_rooms').doc(roomId).set({
+        'roomId': roomId,
+        'users': [currentUserId, receiverId],
+        'lastMessage': '📸 Đã gửi một ảnh', // Hiện chữ thay vì hiện nguyên cái URL dài ngoằng
+        'lastMessageTime': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+
+    } catch (e) {
+      print("Lỗi khi gửi ảnh: $e");
     }
   }
 }

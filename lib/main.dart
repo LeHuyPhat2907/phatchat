@@ -11,7 +11,7 @@ void main() async {
   await Firebase.initializeApp();
 
   // Gọi hàm khởi tạo từ FirebaseService
-  await FirebaseService.setupFirebase();
+  await AppFirebaseService.setupFirebase();
 
   runApp(const MyApp());
 }
